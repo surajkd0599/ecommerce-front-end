@@ -3,6 +3,8 @@ import classes from "./UserView.module.css";
 import Button from "../UI/Button/Button";
 import axios from "axios";
 import Spinner from "../UI/Spinner/Spinner";
+import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css'
 
 const CustomerView = (props) => {
   console.log("Props in list is", props);
@@ -53,49 +55,49 @@ const CustomerView = (props) => {
   return (
     <section className={classes.UserView}>
       <h4>Fetched Users</h4>
-      <table>
-        <thead>
-          <tr>
-            <th>S.No</th>
-            <th>User Id</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Active</th>
-            <th>Activate</th>
-            <th>DeActivate</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <Thead>
+          <Tr>
+            <Th>S.No</Th>
+            <Th>User Id</Th>
+            <Th>First Name</Th>
+            <Th>Last Name</Th>
+            <Th>Email</Th>
+            <Th>Active</Th>
+            <Th>Activate</Th>
+            <Th>DeActivate</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
           {props.fetchedUsers.map((user,count) => (
-            <tr key={user.id}>
-              <td key={user.id}>{count+1}</td>
+            <Tr key={user.id}>
+              <Td key={user.id}>{count+1}</Td>
 
-              <td>{user.id}</td>
-              <td>{user.firstName}</td>
-              <td>{user.lastName}</td>
-              <td>{user.email}</td>
-              <td>{String(user.active)}</td>
-              <td>
+              <Td>{user.id}</Td>
+              <Td>{user.firstName}</Td>
+              <Td>{user.lastName}</Td>
+              <Td>{user.email}</Td>
+              <Td>{String(user.active)}</Td>
+              <Td>
                 <Button
                   clicked={() => activateUserHandler(user.id)}
                   btnType="Success"
                 >
                   Activate
                 </Button>
-              </td>
-              <td>
+              </Td>
+              <Td>
                 <Button
                   clicked={() => deActivateUserHandler(user.id)}
                   btnType="Danger"
                 >
                   DeActivate
                 </Button>
-              </td>
-            </tr>
+              </Td>
+            </Tr>
           ))}
-        </tbody>
-      </table>
+        </Tbody>
+      </Table>
     </section>
   );
 };

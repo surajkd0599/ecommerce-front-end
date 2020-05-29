@@ -3,37 +3,23 @@ import { updateObject, checkValidity } from "../../shared/utility";
 import Spinner from "../../components/UI/Spinner/Spinner";
 import Input from "../../components/UI/Input/Input";
 import Button from "../../components/UI/Button/Button";
-import classes from "./Admin.module.css";
-import CustomerView from "../../components/admin/CustomerView";
-import SellerView from "../../components/admin/SellerView";
+import classes from "./Form.module.css";
+import FieldView from "../../components/category/FieldView";
 import axios from "axios";
 import Aux from "../../hoc/Aux/aux";
 
-const Admin = React.memo((props) => {
+const MetaDataFields = React.memo((props) => {
   const [params, setParams] = useState({
-    role: {
-      elementType: "select",
-      elementConfig: {
-        options: [
-          { value: "none", displayValue: "SELECT USER TYPE" },
-          { value: "cust", displayValue: "Customer" },
-          { value: "sell", displayValue: "Seller" },
-        ],
-      },
-      validation: {},
-      value: "none",
-      isValid: true,
-    },
-    SortBy: {
+    sortBy: {
       elementType: "select",
       elementConfig: {
         options: [
           { value: "none", displayValue: "SELECT SORT BY" },
-          { value: "userId", displayValue: "UserId" },
+          { value: "id", displayValue: "id" },
         ],
       },
       validation: {},
-      value: "userId",
+      value: "id",
       isValid: true,
     },
     page: {
@@ -62,11 +48,23 @@ const Admin = React.memo((props) => {
       isValid: false,
       touched: false,
     },
+    order: {
+      elementType: "select",
+      elementConfig: {
+        options: [
+          { value: "none", displayValue: "SELECT ORDER BY" },
+          { value: "ASC", displayValue: "ASCENDING" },
+          { value: "DESC", displayValue: "DESCENDING" },
+        ],
+      },
+      validation: {},
+      value: "",
+      isValid: true,
+    },
   });
 
   const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [queries,setQueries]  = useState()
+  const [fields, setFields] = useState([]);
 
   const submitHandler = (event) => {
     event.preventDefault();
@@ -77,16 +75,12 @@ const Admin = React.memo((props) => {
     const paramData = {};
 
     for (let key in params) {
-      if (key !== "role") {
-        if (key !== "SortBy") {
-          query = query + "&" + key + "=" + params[key].value;
-        } else {
-          query = query + key + "=" + params[key].value;
-        }
+      if (key !== "sortBy") {
+        query = query + "&" + key + "=" + params[key].value;
+      } else {
+        query = query + key + "=" + params[key].value;
       }
     }
-
-    setQueries(query)
 
     console.log("Query passed is", query);
 
@@ -94,56 +88,37 @@ const Admin = React.memo((props) => {
       paramData[key] = params[key].value;
     }
 
-    console.log("Role is", paramData.role);
-
-    let fetchedData = null;
-
-    if (paramData.role === "cust") {
-      fetchedData = axios.get(
-        "http://localhost:8080/ecommerce/admin/customers" + query
-      );
-      setLoading(false);
-    } else {
-      fetchedData = axios.get(
-        "http://localhost:8080/ecommerce/admin/sellers" + query
-      );
-      setLoading(false);
-    }
-
-    fetchedData
+    axios.get("http://localhost:8080/ecommerce/admin/metaDataField"+query)
       .then((response) => {
         result = response.data;
-        setUsers(result);
+        setFields(result);
+        setLoading(false)
         console.log("Data received is: ", response);
         console.log("Data fetched is", response.data);
       })
       .catch((error) => {
         console.log("Error is", error.response.data.message);
+        setLoading(false)
       });
   };
 
-
   const inputChangedHandler = (event, paramName) => {
-    const updatedSchedules = updateObject(params, {
+    const updatedData = updateObject(params, {
       [paramName]: updateObject(params[paramName], {
         value: event.target.value,
         valid: checkValidity(event.target.value, params[paramName].validation),
         touched: true,
       }),
     });
-    setParams(updatedSchedules);
+    setParams(updatedData);
   };
 
-  const userListHandler = (l) => {
-    if (params.role.value === "cust") {
+  const fieldListHandler = (l) => {
+ 
       if (l > 0) {
-        return <CustomerView fetchedUsers={users} queryPassed={queries} />;
+        return <FieldView fetchedFields={fields}/>;
       }
-    } else {
-      if (l > 0) {
-        return <SellerView fetchedUsers={users} queryPassed={queries} />;
-      }
-    }
+    
   };
 
   const formElementsArray = [];
@@ -173,18 +148,18 @@ const Admin = React.memo((props) => {
 
   return (
     <Aux>
-      <div className={classes.AdminData}>
+      <div className={classes.FormData}>
         <form onSubmit={submitHandler}>
-          <h4>Enter User Type</h4>
+          <h4>Enter Field Parameters</h4>
           {form}
-          <Button btnType="Success">Get Users</Button>
+          <button type="submit">Get Fields</button>
         </form>
       </div>
       <div>
-        <section>{userListHandler(users.length)}</section>
+        <section>{fieldListHandler(fields.length)}</section>
       </div>
     </Aux>
   );
 });
 
-export default Admin;
+export default MetaDataFields;

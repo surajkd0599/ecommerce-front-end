@@ -1,29 +1,17 @@
-.UserView {
-    margin: 50px auto;
-    text-align: center;
-    padding: 10px;
-  }
-  
   .UserView h4 {
-    margin: 0px auto;
+    margin: 20px auto;
     color: rgb(46, 20, 117);
-    width: 120%;
+    width: 80%;
     text-align: center;
     box-shadow: 0 2px 3px #ccc;
     border: 1px solid #eee;
     padding: 10px;
     box-sizing: border-box;
-    background-color: rgb(255, 52, 147);
+    background-color: rgba(164, 250, 26, 0.938);
   }
   
   @media (min-width: 600px) {
-    .UserView,
-    .UserView table,
-    .UserView h2,
-    .UserView h4,
-    .UserView td,
-    .UserView th,
-    .UserView thead {
+    .UserView h4 {
       width: 500px;
     }
   }
@@ -46,6 +34,7 @@
     border: 3px solid #ddd;
     flex-flow: column;
     width: 100%;
+    margin: 0px 20px 0px 20px;
   }
   
   .UserView td,

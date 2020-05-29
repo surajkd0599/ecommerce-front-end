@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import classes from "./Login.module.css";
 import { updateObject, checkValidity } from "../../../shared/utility";
 import Input from "../../../components/UI/Input/Input";
 import Spinner from "../../../components/UI/Spinner/Spinner";
-import axios from "axios"
+import { connect } from "react-redux";
+import { Redirect } from "react-router-dom"
+import * as actions from "../../../store/actions/index"
 
 const Login = React.memo((props) => {
+
   const [login, setLogin] = useState({
     username: {
       elementType: "input",
@@ -38,7 +41,13 @@ const Login = React.memo((props) => {
     },
   });
 
-  const [loading, setLoading] = useState(false)
+  const { authRedirectPath, onAuthRedirect } = props;
+
+  useEffect(() => {
+    if (authRedirectPath !== "/") {
+      onAuthRedirect();
+    }
+  }, [authRedirectPath,  onAuthRedirect]);
 
   const inputChangedHandler = (event, loginData) => {
     const updatedSchedules = updateObject(login, {
@@ -74,44 +83,30 @@ const Login = React.memo((props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    setLoading(true)
-
-    const loginData = {grant_type: "password", client_id: "live-test", client_secret: "abcde"}
-
-    let form_data = new FormData();
-
-    for(let key in login){
-      loginData[key] = login[key].value
-      console.log("LOGIN KEY : ",login[key])
-      form_data.append(key, login[key].value);
-    }
-
-
- for ( let key in loginData ) {
-    
- }
-
-    console.log("Login Information : ",loginData)
-    console.log("Login Information form data is : ",form_data)
-
-    axios.post("http://localhost:8080/ecommerce/oauth/token",loginData)
-    .then(response => {
-      console.log("Login response : ",response)
-      console.log("Login response data : ",response.data)
-      setLoading(false)
-    }).catch(error => {
-      console.log("Login error is : ",error)
-      setLoading(false)
-    })
+    //props.onAuth(login.username.value, login.password.value)
+    props.onAuth(login)
   };
 
-  if (loading) {
+  if (props.loading) {
     form = <Spinner />;
+  }
+
+  let errorMessage = null;
+
+  if (props.error) {
+    errorMessage = <p>{props.error.message}</p>;
+  }
+
+  let authRedirect = null;
+  if (props.isAuthenticated) {
+    authRedirect = <Redirect to={props.authRedirectPath} />;
   }
 
   return (
     <div className={classes.LoginData}>
       <h4>Login</h4>
+      {authRedirect}
+      {errorMessage}
       <form onSubmit={submitHandler}>
         {form}
         <button type="submit">LOGIN</button>
@@ -120,4 +115,21 @@ const Login = React.memo((props) => {
   );
 });
 
-export default Login;
+const mapStateToProps = (state) => {
+  return {
+    loading: state.auth.loading,
+    error: state.auth.error,
+    isAuthenticated: state.auth.token !== null,
+    authRedirectPath: state.auth.authRedirectPath,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onAuth: (login) =>
+      dispatch(actions.auth(login)),
+    onAuthRedirect: () => dispatch(actions.authRedirect("/")),
+  };
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(Login);

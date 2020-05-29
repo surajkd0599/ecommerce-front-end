@@ -5,6 +5,7 @@ import NavigationItems from "../NavigationItems/NavigationItems";
 import classes from "./SideDrawer.module.css";
 import Backdrop from "../../UI/Backdrop/Backdrop";
 import Aux from "../../../hoc/Aux/aux";
+import Search from "../../../containers/Search/Search";
 
 const sideDrawer = (props) => {
   let attachedClasses = [classes.SideDrawer, classes.Close];
@@ -18,6 +19,9 @@ const sideDrawer = (props) => {
         <div className={classes.Logo}>
           <Logo />
         </div>
+        <nav>
+          <Search />
+        </nav>
         <nav>
           <NavigationItems isAuthenticated = {props.isAuth}/>
         </nav>

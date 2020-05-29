@@ -3,6 +3,7 @@ import classes from "./Toolbar.module.css";
 import Logo from "../../Logo/Logo";
 import NavigationItems from "../NavigationItems/NavigationItems";
 import DrawerToggle from "../SideDrawer/DrawerToggle/DrawerToggle";
+import Search from "../../../containers/Search/Search";
 
 const toolbar = (props) => (
   <header className={classes.Toolbar}>
@@ -10,6 +11,11 @@ const toolbar = (props) => (
     <div className={classes.Logo}>
       <Logo />
     </div>
+
+    <nav className = {classes.DesktopOnly}>
+    <Search />
+    </nav>
+    
     <nav className={classes.DesktopOnly}>
       <NavigationItems isAuthenticated = {props.isAuth} />
     </nav>

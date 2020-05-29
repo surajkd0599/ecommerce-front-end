@@ -4,27 +4,12 @@ import { updateObject, checkValidity } from "../../../../shared/utility";
 import Input from "../../../../components/UI/Input/Input";
 import Spinner from "../../../../components/UI/Spinner/Spinner";
 import Button from "../../../../components/UI/Button/Button";
-import Address from "../../../Address/Address";
-import { Route, Redirect } from "react-router";
 import Aux from "../../../../hoc/Aux/aux";
 import axios from "axios";
-import AddressForm from "../../../Address/Form/AddressForm";
+import withErrorHandler from "../../../../hoc/withErrorHandler/withErrorHandler";
 
 const CustomerRegister = (props) => {
   const [register, setRegister] = useState({
-    // registerAs: {
-    //   elementType: "select",
-    //   elementConfig: {
-    //     options: [
-    //       { value: "none", displayValue: "SELECT ROLE" },
-    //       { value: "sell", displayValue: "Seller" },
-    //       { value: "cust", displayValue: "Customer" },
-    //     ],
-    //   },
-    //   validation: {},
-    //   value: "none",
-    //   isValid: true,
-    // },
     username: {
       elementType: "input",
       elementConfig: {
@@ -164,8 +149,6 @@ const CustomerRegister = (props) => {
 
   const [loading, setLoading] = useState(false);
 
-  const [address, setAddress] = useState([]);
-
   const inputChangedHandler = (event, registerData) => {
     const updatedSchedules = updateObject(register, {
       [registerData]: updateObject(register[registerData], {
@@ -201,29 +184,12 @@ const CustomerRegister = (props) => {
     />
   ));
 
-  const addAddressHandler = useCallback((add) => {
-    console.log("Added Address is", add);
-    setAddress((prevAddress) => [...prevAddress, { ...add }]);
-  }, []);
-
   const submitHandler = (event) => {
     console.log("In submit block")
     event.preventDefault();
     setLoading(true);
-    console.log("Addresses are: ", address);
 
-    const addresses = [];
-
-    for (let add in address) {
-      const add1 = {};
-      const addressData = address[add];
-      console.log("Address is", addressData);
-      for (let key in address[add]) {
-        add1[key] = addressData[key].value;
-      }
-      addresses.push(add1);
-    }
-    const registerData = { accountNonLocked: true, addresses };
+    const registerData = { accountNonLocked: true };
 
     for (let key in register) {
       registerData[key] = register[key].value;
@@ -231,7 +197,6 @@ const CustomerRegister = (props) => {
 
     setLoading(false);
     console.log("Registered data is", registerData);
-    props.history.push("/address")
 
     axios
       .post("http://localhost:8080/ecommerce/register/customer", registerData)
@@ -240,6 +205,7 @@ const CustomerRegister = (props) => {
       })
       .catch((error) => {
         console.log("Error is", error);
+        alert(error.response.data.message)
       });
   };
 
@@ -256,12 +222,8 @@ const CustomerRegister = (props) => {
           <Button btnType="Success">Register</Button>
         </form>
       </div>
-      <div>
-        <AddressForm onAddAddress={addAddressHandler} role={"CUSTOMER"} />
-      </div>
-      
     </Aux>
   );
 };
 
-export default CustomerRegister;
+export default (CustomerRegister);

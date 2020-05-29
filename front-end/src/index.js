@@ -8,11 +8,17 @@ import { Provider } from "react-redux";
 import { createStore, compose, applyMiddleware, combineReducers } from "redux";
 import authReducer from "./store/reducers/auth";
 import redirectReducer from "./store/reducers/redirect";
+import categoryReducer from "./store/reducers/category";
+import sellerRegisterReducer from "./store/reducers/sellerRegister";
+import categoryByIdReducer from "./store/reducers/viewCategory";
 import thunk from "redux-thunk";
 
 const rootReducer = combineReducers({
   auth: authReducer,
   redirect: redirectReducer,
+  category: categoryReducer,
+  sellerRegister: sellerRegisterReducer,
+  categoryById: categoryByIdReducer,
 });
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

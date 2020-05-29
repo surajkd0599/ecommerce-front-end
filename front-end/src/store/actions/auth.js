@@ -1,5 +1,6 @@
 import * as actionTypes from "./actionTypes";
 import axios from "axios";
+import qs from "qs"
 
 export const authStart = () => {
   return {
@@ -39,34 +40,35 @@ export const checkAuthTimeout = (expirationTime) => {
   };
 };
 
-export const auth = (email, password, isSignup) => {
+export const auth = (login) => {
   return (dispatch) => {
     dispatch(authStart());
-    const authData = {
-      email: email,
-      password: password,
-      returnSecureToken: true,
-    };
 
-    let url =
-      "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCiiPZRIQYQyw8s-VgJUBWT3PERiEreUKM";
-    if (!isSignup) {
-      url =
-        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCiiPZRIQYQyw8s-VgJUBWT3PERiEreUKM";
+    console.log("Login info is :" , login)
+    const loginData = {grant_type: "password", client_id: "live-test", client_secret: "abcde"}
+
+    for(let key in login){
+      loginData[key] = login[key].value
     }
+
+
+
+
+    console.log("Login Information : ",loginData)
+
     axios
-      .post(url, authData)
+      .post("http://localhost:8080/ecommerce/login",qs.stringify(loginData))
       .then((response) => {
         console.log(response);
         console.log(response.data);
-        const expirationDate = new Date(
-          new Date().getTime() + response.data.expiresIn * 1000
-        );
-        localStorage.setItem("token", response.data.idToken);
-        localStorage.setItem("expirationDate", expirationDate);
-        localStorage.setItem("userId", response.data.localId);
-        dispatch(authSuccess(response.data.idToken, response.data.localId));
-        dispatch(checkAuthTimeout(response.data.expiresIn));
+         const expirationDate = new Date(
+           new Date().getTime() + response.data.expiresIn * 1000
+         );
+         localStorage.setItem("Authorization", "Bearer "+response.data.access_token);
+         localStorage.setItem("expirationDate", expirationDate);
+         localStorage.setItem("Authorization","Bearer "+response.data.refresh_token);
+        // dispatch(authSuccess(response.data.idToken, response.data.localId));
+         dispatch(checkAuthTimeout(response.data.expiresIn));
       })
       .catch((error) => {
         console.log(error);
@@ -90,8 +92,8 @@ export const authCheckState = () => {
     } else {
       const expirationDate = new Date(localStorage.getItem("expirationDate"));
       if (expirationDate > new Date()) {
-        const userId = localStorage.getItem("userId");
-        dispatch(authSuccess(token, userId));
+        //const userId = localStorage.getItem("userId");
+        //dispatch(authSuccess(token, userId));
         dispatch(
           checkAuthTimeout((expirationDate.getTime() - new Date().getTime())/1000)
         );

@@ -4,7 +4,8 @@ import { updateObject, checkValidity } from "../../../shared/utility";
 import Input from "../../../components/UI/Input/Input"
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import Button from "../../../components/UI/Button/Button"
-import axios from "axios";
+import { connect } from "react-redux"
+import * as actions from "../../../store/actions/index"
 
 const AddressForm = (props) => {
   const [address, setAddress] = useState({
@@ -142,10 +143,6 @@ const AddressForm = (props) => {
     },
   });
 
-  const [loading, setLoading] = useState(false);
-  const [disabled, setDisabled] = useState(false)
-  
-
   const inputChangedHandler = (event, registerData) => {
     const updatedAddress = updateObject(address, {
       [registerData]: updateObject(address[registerData], {
@@ -183,28 +180,22 @@ const AddressForm = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    setLoading(true)
-    props.onAddAddress({
-      block: address.block,
-      plotNumber: address.plotNumber,
-      sectorNumber: address.sectorNumber,
-      streetName: address.streetName,
-      label: address.label,
-      city: address.city,
-      district: address.district,
-      zipCode: address.zipcode,
-      country: address.country,   
-    });
-    let count = 0
-    if(props.role === "SELLER"){
-      if(count > -1){
-        setDisabled(true)
-      }
+    
+    const addresses = []
+    const addressData = {}
+    for(let key in address){
+      addressData[key] = address[key].value;
     }
-    setLoading(false)
+
+    addresses.push(addressData)
+    const registeredSeller = {...props.sellerInfo,addresses}
+
+    console.log("Submitted seller info is : ",registeredSeller)
+    props.onRegister(registeredSeller)
+
   };
 
-  if (loading) {
+  if (props.loading) {
     form = <Spinner />;
   }
 
@@ -213,10 +204,24 @@ const AddressForm = (props) => {
       <h4>Enter Address Details</h4>
       <form onSubmit={submitHandler}>
         {form}
-        {<Button disabled = {disabled} btnType="Success">Add Address</Button>}
+        {<Button btnType="Success">Register</Button>}
       </form>
     </div>
   );
 };
 
-export default AddressForm;
+const mapStateToProps = (state) => {
+  return {
+    loading: state.sellerRegister.loading,
+    sellerInfo: state.sellerRegister.sellerInfo,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onRegister: (registeredSeller) =>
+      dispatch(actions.sellerRegister(registeredSeller)),
+  };
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(AddressForm);

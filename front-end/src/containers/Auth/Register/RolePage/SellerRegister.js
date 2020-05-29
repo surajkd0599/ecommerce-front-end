@@ -1,28 +1,16 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import classes from "./Register.module.css";
 import { updateObject, checkValidity } from "../../../../shared/utility";
 import Input from "../../../../components/UI/Input/Input";
 import Spinner from "../../../../components/UI/Spinner/Spinner";
 import Button from "../../../../components/UI/Button/Button";
 import AddressForm from "../../../Address/Form/AddressForm";
-import axios from "axios";
 import Aux from "../../../../hoc/Aux/aux";
+import * as actions from "../../../../store/actions/index";
+import { connect } from "react-redux";
 
 const SellerRegister = (props) => {
   const [register, setRegister] = useState({
-    // registerAs: {
-    //   elementType: "select",
-    //   elementConfig: {
-    //     options: [
-    //       { value: "none", displayValue: "SELECT ROLE" },
-    //       { value: "sell", displayValue: "Seller" },
-    //       { value: "cust", displayValue: "Customer" },
-    //     ],
-    //   },
-    //   validation: {},
-    //   value: "none",
-    //   isValid: true,
-    // },
     username: {
       elementType: "input",
       elementConfig: {
@@ -187,7 +175,7 @@ const SellerRegister = (props) => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [address, setAddress] = useState([]);
+  const [isAdd, setAdd] = useState(false);
 
   const inputChangedHandler = (event, registerData) => {
     const updatedSchedules = updateObject(register, {
@@ -224,76 +212,45 @@ const SellerRegister = (props) => {
     />
   ));
 
-  const addAddressHandler = useCallback((add) => {
-    console.log("Added Address is", add);
-    setAddress((prevAddress) => [...prevAddress, { ...add }]);
-  }, []);
-
   const submitHandler = (event) => {
     event.preventDefault();
     setLoading(true);
-
-    const addresses = [];
-
-    for (let add in address) {
-      const add1 = {};
-      const addressData = address[add];
-      console.log("Address is", addressData);
-      for (let key in address[add]) {
-        add1[key] = addressData[key].value;
-      }
-      addresses.push(add1);
-    }
-
     const registerData = { accountNonLocked: true };
 
     for (let key in register) {
       registerData[key] = register[key].value;
     }
 
-    console.log("registered data is", registerData);
-    console.log("Registered as,", register.registerAs.value);
-    let responseData = null;
-    if (register.registerAs.value === "emp") {
-      console.log("In employe block");
-      responseData = axios.post(
-        "http://localhost:8080/ecommerce/auth/customer",
-        registerData
-      );
-    } else {
-      responseData = axios.post(
-        "http://localhost:8080/college/auth/seller",
-        registerData
-      );
-    }
-    responseData
-      .then((response) => {
-        setLoading(false);
-        console.log("Registered data response is", response);
-        alert(response.data);
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.log("Error is", error);
-      });
+    props.onSubmitInfo(registerData)
+    setAdd(true);
+    setLoading(false)
   };
 
   if (loading) {
     form = <Spinner />;
   }
 
+  if (isAdd) {
+    return <AddressForm />;
+  }
+  
   return (
-    <Aux  style={{ textAlign: "center" }}>
+    <Aux style={{ textAlign: "center" }}>
       <div className={classes.RegisterData}>
         <h4>Seller Register</h4>
-        <form onSubmit={submitHandler}>{form}</form>
+        <form onSubmit={submitHandler}>
+          {form}
+          <Button btnType="Success">Continue</Button>
+        </form>
       </div>
-      <div>
-        <AddressForm onAddAddress={addAddressHandler} role={"SELLER"} />
-      </div>
-      <Button btnType="Success">Submit</Button>
     </Aux>
   );
 };
 
-export default SellerRegister;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onSubmitInfo: (register) => dispatch(actions.addSellerInfo(register)),
+  };
+};
+
+export default connect(null,mapDispatchToProps)(SellerRegister);

@@ -1,11 +1,7 @@
-export {
-  addIngredient,
-  removeIngredient,
-  initIngredients,
-} from "./burgerBuilder";
+export { fetchCategories } from "./category";
 
-export { orderStart, purchaseInit, fetchOrders } from "./order";
+export { fetchCategoriesById } from "./viewCategory"
 
 export { auth, logout, authRedirect, authCheckState } from "./auth";
 
-export { scheduleRedirect } from "./schedule"
+export { addSellerInfo, sellerRegister } from "./sellerRegister"

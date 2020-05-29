@@ -12,6 +12,38 @@ const navigationItems = (props) => (
       UserInfo
     </NavigationItem>
 
+    <NavigationItem link="/profileImage" active>
+      UploadImage
+    </NavigationItem>
+
+    <NavigationItem link="/addMetaData" active>
+      MetaData
+    </NavigationItem>
+
+    <NavigationItem link="/getMetaData" active>
+      MetaDataView
+    </NavigationItem>
+
+
+    <NavigationItem link="/addCategory" active>
+      AddCategory
+    </NavigationItem>
+
+    <NavigationItem link="/value" active>
+      AddValue
+    </NavigationItem>
+
+    <NavigationItem link="/getCategory" active>
+      GetCategory
+    </NavigationItem>
+
+
+ <NavigationItem link="/forgotPassword" active>
+      ForgotPassword
+    </NavigationItem>
+    <NavigationItem link="/resetPassword" active>
+      ResetPassword
+    </NavigationItem>
     {!props.isAuthenticated ? (
       <NavigationItem link="/auth">Auth</NavigationItem>
     ) : (
